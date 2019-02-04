@@ -1,18 +1,3 @@
-<?php
-    namespace pal\login3;
-    use  pal\login3\Database;
-
-    session_start();
-    print_r($_SESSION['email']);
-    if($_SESSION['email'])
-    {
-        echo "You are already logged in.Go to Home <a href='login.php'></a>";
-    }
-    else{
-    // error_reporting(E_ALL);
-    // ini_set('display_errors', 1);
-?>
-
 <!Doctype html>
     <head>
         <meta charset="UTF-8">
@@ -20,9 +5,8 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     </head>
-
     <body>
-        <h1>REGISTER HERE..</h1>
+        <h1>Registration by ADMIN</h1>
         <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="POST" > 
             <label for="name">Name</label>
             <input type="text"  name="name" placeholder="Your name.."required>
@@ -30,7 +14,11 @@
             <input type="email"  name="email" placeholder="Your email address"required>
             <label for="password">password</label>
             <input type="password" name="password" placeholder="your password.."required>
-            <input type="submit" value="register">
+            <select name='roles'>
+            <option value="admin">admin</option>
+            <option value="guest">guest</option>
+            </select>
+            <input type="submit" value="add user">
             <a href ="login.php">Login</a>
         </form>
     </body>
@@ -38,27 +26,33 @@
 
 <?php
 
-
-    // include "Database.php";
-    // echo $_POST['name'].$_POST['email'].$_POST['password'];
+    use  pal\login3\Database;
     require 'vendor/autoload.php';
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    //  $roles="admin";
     $obj=new Database();
     $con=$obj->conn;
-    $roles="Guest";
     if($_SERVER["REQUEST_METHOD"]=="POST")
     {
-        if(!$obj->check($_POST['name'],$_POST['email'],$_POST['password']))
+        if($obj->Added($_POST['name'],$_POST['email'],$_POST['password'],$_POST['roles']))
         {
-            if($obj->Added($_POST['name'],$_POST['email'],$_POST['password'],$roles)=="admin")
-
             echo"Register successfully!!";
-            header("location:admin.php"); 
+            if($_POST['roles']=="admin"){
             
+                header("location:admin.php");      
+            }
+            else{
+                header("location:welcome.php");    
+            }  
+        
+
         }
-
+        
+        else{
+            echo"registration failed";
+            header("location:admin.php");     
+        }
     }
-        $obj->mailer($_POST['email'],md5($_POST['password']));
-    }
-
 
 ?>
